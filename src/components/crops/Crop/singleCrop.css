@@ -1,0 +1,53 @@
+.Altimagedivs {
+    height: 4.1rem;
+    width: 5.9rem;
+    margin: 7px 0px;
+}
+
+.Altimages {
+    height: 100%;
+    width: 100%;
+}
+
+.Currimage {
+    height: 100%;
+    width: 100%;
+}
+
+.Aside1 {
+    display: inline-block;
+    vertical-align: text-bottom;
+    width: 7%;
+    margin-right: 5px;
+}
+
+.Aside2 {
+    display: inline-block;
+    vertical-align: top;
+    width: 45%;
+    height: 72%;
+    margin-left: 41px;
+}
+
+.Aside3 {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 43px;
+    width: 38%;
+}
+
+.Font1 {
+    font-family: 'Baloo Thambi 2', cursive;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 2rem;
+}
+
+.Font2 {
+    font-family: 'Baloo Thambi 2', cursive;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.Font3 {}

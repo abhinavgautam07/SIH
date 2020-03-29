@@ -1,0 +1,26 @@
+.Allcropscard {
+    border: 1px solid #dcdcdc;
+    width: 29rem;
+    height: 8rem;
+    margin: 5px 0px;
+    padding: 17px;
+}
+
+.Allcropimage {
+    height: 81%;
+    width: 23%;
+    margin-top: 8px;
+}
+
+.Allcropdesc {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 18px;
+    margin-top: 2px;
+}
+
+.Currimage {
+    width: 98%;
+    height: 98%;
+    margin: 4px 4px 4px 4px;
+}
