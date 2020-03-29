@@ -3,7 +3,9 @@ import Nav from 'react-bootstrap/Nav';
 // import { InputGroup, FormControl, Button } from 'react-bootstrap';
 import {Input,Button} from 'reactstrap';
 import  './singleCrop.css';
-import Toast from '../../UI/Toasts/Toast';
+// import Toast from '../../UI/Toasts/Toast';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 //some variables
 
 const style2 = {
@@ -34,11 +36,39 @@ const fetchCart = (itemDet) => {
     }
     return itemDet;
 }
+toast.configure();
 class SingleCrop extends Component {
+
+    cartAdditonHandler=(content)=>{
+        if(this.state.cartAmount>0){
+            return(toast.success(`${this.state.cartAmount} item(s) added to cart`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                }));
+        }else{
+            return (toast.warn('Please input valid amount', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                }));
+        }
+    }
+    changeHandler=(event)=>{
+        console.log('changer');
+        
+        this.setState({cartAmount:event.target.value});
+    }
 
     state = {
         crop: null,
-        showToast: false,
+        cartAmount:0
     }
 
     componentDidMount = () => {
@@ -103,17 +133,13 @@ class SingleCrop extends Component {
 
     
 
-    cartAdd = () => {
-        this.setState({
-            showToast: true
-        });
-    }
+   
 
     render() {
 
         return (
             <React.Fragment>
-                {this.state.showToast ? <Toast header="Added to Cart" body="3 items added to cart" /> : null}
+                {/* {this.state.showToast ? <Toast header="Added to Cart" body="3 items added to cart" /> : null} */}
                 
               {
                   this.state.crop ?   <div style={{ height: '478px',paddingTop:'2px',paddingLeft:'13px' }}>
@@ -162,16 +188,17 @@ class SingleCrop extends Component {
                       <Input className="mb-3"
                           id="quantity"
                               placeholder="0"
+                              
                               type="number"
                               min="0"
-                              autofocus
+                              onChange={(event)=>this.changeHandler(event)}
                               aria-describedby="basic-addon2">
                           
 
                       </Input>
                       <br />
                       <br />
-                      <Button variant="dark" size="lg" block onClick={this.cartAdd} style={{backgroundColor:'black'}} >
+                      <Button variant="dark" size="lg" block onClick={()=>this.cartAdditonHandler('kk')} style={{backgroundColor:'black'}} >
                           Add to cart
 </Button>
                   </aside>
