@@ -1,14 +1,84 @@
 import React, { Component } from "react";
 import axios from "axios";
-import {
-  initializeFirebase,
-  getcapcha,
-  sendotp,
-  confirmotp,
-  register,
-  checkIntialized
-} from "../../firebase";
+// import {
+//   initializeFirebase,
+//   getcapcha,
+//   sendotp,
+//   confirmotp,
+//   register,
+//   checkIntialized
+// } from "../../firebase";
 import { Alert } from "react-bootstrap";
+import { gql } from 'apollo-boost';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+
+const LOGIN_QUERRY = gql`
+query($emailOrPhone:String!,$password:String!){
+  user(emailOrPhone:$emailOrPhone,password:$password){
+    name
+    emailOrPhone
+    authToken
+  }
+}
+`
+
+const SIGNUP_MUTATION = gql`
+mutation($emailorphone: String!, $password: String!, $firstName: String!,$role: String!,$address: String!) {
+  addUser(emailOrPhone: $emailorphone, password: $password, firstName: $firstName,lastName:$lastName,role:$role,address:$address) {
+    name
+    emailOrPhone
+    authToken
+  }
+}
+`
+
+function SignUpComponent(props) {
+  console.log('hey1');
+  const [signUp, { data , loading , error }] = useMutation(SIGNUP_MUTATION);
+  if (error) { return `Error! ${error}` }
+  if (loading) { return null }
+  console.log(data);
+  return (
+    <div>
+      <h1>Hi</h1>
+      <button onClick={(e) => { signUp({ variables: { emailorphone: props.email, password: props.password, firstName: props.firstName, lastName:props.lastName,role:props.role,address:props.address} }) }}>Button</button>
+    </div>
+  );
+}
+
+function LoginComponent(props) {
+  const { data, error, loading } = useQuery(LOGIN_QUERRY, {
+    variables: { emailOrPhone: props.email, password: props.password }
+  });
+  if (error) { return `Error! ${error}` }
+  if (loading) { return null }
+  let user = {
+    name: data.user.name,
+    email: data.user.email
+  }
+  confirmFunction(true, user, data.user.authToken);
+  return (
+    <div>
+      <h1>Hi</h1>
+    name:{data.user.name}
+    </div>
+  );
+}
+
+function confirmFunction(login, user, authToken){
+  if (login) {
+    saveUserData(authToken, user)
+  }
+  else {
+    saveUserData(authToken, user)
+  }
+}
+
+function saveUserData(token, user) {
+  localStorage.setItem('AUTH_TOKEN', token);
+  localStorage.setItem('USER_NAME', user.name);
+  localStorage.getItem('USER_EMAIL',user.email);
+}
 
 const name = "";
 class Login extends Component {
@@ -30,68 +100,68 @@ class Login extends Component {
     this.handleDismiss = this.handleDismiss.bind(this);
   }
   componentDidMount() {
-    getcapcha();
+    //getcapcha();
   }
-  confirmsotp(code) {
-    var res = confirmotp(code);
-    var self = this;
-    res.then(uid => {
-      if (!this.state.ok) {
-        this.props.history.push("/");
-      } else {
-        axios
-          .get(
-            `https://maps.googleapis.com/maps/api/geocode/json?address="${
-              this.state.address
-            }"&key=AIzaSyCtdX4pdjZuI2eMMRDb5QBlcr4e5l2D3_Q`
-          )
-          .then(data => {
-            console.log(data);
-            if(!data.data.results.length)
-            {
-              register(
-                {
-                  first_name: this.state.first_name,
-                  last_name: this.state.last_name,
-                  username: this.state.username,
-                  email: this.state.email,
-                  phone: "+91"+this.state.password,
-                  addresslat: 27,
-                  addresslng: 80,
-                  role:this.state.role,
-                },
-                uid
-              ).then(() => {
-                console.log("dekh le");
-                self.props.history.push("/login");
-              });
-            }
-            else
-            {
-            register(
-              {
-                first_name: this.state.first_name,
-                last_name: this.state.last_name,
-                username: this.state.username,
-                email: this.state.email,
-                phone: "+91"+this.state.password,
-                addresslat: data.data.results[0].geometry.location.lat,
-                addresslng: data.data.results[0].geometry.location.lng,
-                role:this.state.role,
-              },
-              uid
-            ).then(() => {
-              console.log("dekh le");
-              self.props.history.push("/login");
-            });
-          }
-          });
-      }
-    });
-  }
+  // confirmsotp(code) {
+  //   var res = confirmotp(code);
+  //   var self = this;
+  //   res.then(uid => {
+  //     if (!this.state.ok) {
+  //       this.props.history.push("/");
+  //     } else {
+  //       axios
+  //         .get(
+  //           `https://maps.googleapis.com/maps/api/geocode/json?address="${
+  //             this.state.address
+  //           }"&key=AIzaSyCtdX4pdjZuI2eMMRDb5QBlcr4e5l2D3_Q`
+  //         )
+  //         .then(data => {
+  //           console.log(data);
+  //           if(!data.data.results.length)
+  //           {
+  //             register(
+  //               {
+  //                 first_name: this.state.first_name,
+  //                 last_name: this.state.last_name,
+  //                 username: this.state.username,
+  //                 email: this.state.email,
+  //                 phone: "+91"+this.state.password,
+  //                 addresslat: 27,
+  //                 addresslng: 80,
+  //                 role:this.state.role,
+  //               },
+  //               uid
+  //             ).then(() => {
+  //               console.log("dekh le");
+  //               self.props.history.push("/login");
+  //             });
+  //           }
+  //           else
+  //           {
+  //           register(
+  //             {
+  //               first_name: this.state.first_name,
+  //               last_name: this.state.last_name,
+  //               username: this.state.username,
+  //               email: this.state.email,
+  //               phone: "+91"+this.state.password,
+  //               addresslat: data.data.results[0].geometry.location.lat,
+  //               addresslng: data.data.results[0].geometry.location.lng,
+  //               role:this.state.role,
+  //             },
+  //             uid
+  //           ).then(() => {
+  //             console.log("dekh le");
+  //             self.props.history.push("/login");
+  //           });
+  //         }
+  //         });
+  //     }
+  //   });
+  // }
   sign() {
     let temp = this.state.ok;
-    getcapcha();
+    // getcapcha();
     this.setState({
       ok: !temp
     });
@@ -100,44 +170,53 @@ class Login extends Component {
     if (!document.forms["registerform"].reportValidity()) {
       return;
     }
+    <SignUpComponent first_name={this.state.first_name}
+    last_name={this.state.last_name}
+    username ={this.state.username}
+    email={ this.state.email}
+    password={ "+91"+this.state.password }
+    address= {27}
+    role={this.state.role} />
 
-    var res = sendotp(this.state.password, true);
-    res
-      .then(() => {
-        console.log("sahi");
-        this.setState({
-          getotp: true
-        });
-      })
-      .catch(() => {
-        getcapcha();
-        this.setState({
-          password: "",
-          show: true
-        });
-      });
+    // var res = sendotp(this.state.password, true);
+    // res
+    //   .then(() => {
+    //     console.log("sahi");
+    //     this.setState({
+    //       getotp: true
+    //     });
+    //   })
+    //   .catch(() => {
+    //     getcapcha();
+    //     this.setState({
+    //       password: "",
+    //       show: true
+    //     });
+    //   });
   }
   onlogin() {
     if (!document.forms["loginform"].reportValidity()) {
       return;
     }
     console.log(this.state.password);
-    var res = sendotp(this.state.password, false);
-    res
-      .then(() => {
-        console.log("sahi");
-        this.setState({
-          getotp: true
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setState({
-          password: "",
-          show: true
-        });
-      });
+    // var res = sendotp(this.state.password, false);
+    // res
+    //   .then(() => {
+    //     console.log("sahi");
+    //     this.setState({
+    //       getotp: true
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     this.setState({
+    //       password: "",
+    //       show: true
+    //     });
+    //   });
   }
+
+  
 
   handleDismiss() {
     this.setState({ show: false });
@@ -238,7 +317,7 @@ class Login extends Component {
                     name="password"
                     type="text"
                     className="form-controls"
-                    placeholder="Enter the Phone Number"
+                    placeholder="Enter the Password"
                     value={this.state.password}
                     onChange={e => this.onchange(e)}
                     autoComplete="off"
@@ -274,7 +353,7 @@ class Login extends Component {
                 <br />
                 <br />
                 <div
-                  class="fb-login-button"
+                  className="fb-login-button"
                   data-max-rows="1"
                   data-size="large"
                   data-button-type="continue_with"
