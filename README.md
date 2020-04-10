@@ -2,7 +2,7 @@
 <table>
 <tr>
 <td>
-  A real-time outbreak monitoring web app developed during Smart India Hackathon 2018 connecting hospital with government officials to predict water borne disease beforehand.The system consist of marking of affected Area by officials, registration of cases,display of cases by means of heatmap,alarm system through means of push notification.
+  A real-time  web app developed for adminsitrative monitoring of the buyFresh  app during Smart India Hackathon 2020. The main objective of the app is to the analyse the sales and produnction of crops and take decisions for welfare of the farmers of the Uttrakhand and also the buyers.This app also handles the issues of the customers and the farmers.This app also maintains data related to production and any authorised person may reach out here for the these data.
 </td>
 </tr>
 </table>
