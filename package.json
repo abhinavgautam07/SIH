@@ -22,7 +22,7 @@
         "graphql": "^14.6.0",
         "history": "4.7.2",
         "hoist-non-react-statics": "^3.3.1",
-        "jquery": "^3.4.1",
+        "jquery": "^3.5.0",
         "leaflet": "^1.6.0",
         "node-sass-chokidar": "^1.4.0",
         "npm-run-all": "4.1.3",
