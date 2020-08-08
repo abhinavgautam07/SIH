@@ -9,15 +9,7 @@
 
 
 ## Demo
-Here is a working live demo :  https://dtu-bugbuster.github.io/SIH-Web/
-
-
-## Site
-
-### Landing Page
-Currently it is just a prototype which will be developed further.
-
-![](SIH.gif)
+Here is a working live demo :  https://admin.buyfreshdtu.xyz/
 
 
 ## Instructions to Run
@@ -33,6 +25,6 @@ Currently it is just a prototype which will be developed further.
 ## Built with 
 
 - [ReactJs](https://reactjs.org/) - React makes it painless to create interactive UIs. Design simple views for each state in your application, and React will efficiently update and render just the right components when your data changes.
-- [FireBase](https://firebase.google.com/) -Firebase gives you functionality like analytics, databases, messaging and crash reporting so you can move quickly and focus on your users.
+
 
 
