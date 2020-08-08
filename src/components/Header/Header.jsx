@@ -1,29 +1,23 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import {withRouter} from "react-router-dom"
+import {connect} from 'react-redux';
+import {setCurrentUser} from "../../redux/user/user.actions"
+import {selectCropType,selectCropQuality} from "../../redux/crop/crop.action"
 import {
   Collapse,
   Navbar,
   NavbarToggler,
   NavbarBrand,
   Nav,
-  NavItem,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
   Container,
-  InputGroup,
-  InputGroupText,
-  InputGroupAddon,
-  Input
 } from "reactstrap";
 import Autocomplete from "react-autocomplete";
-import { ToastContainer, toast } from "react-toastify";
-
+import { ToastContainer} from "react-toastify";
 import dashboardRoutes from "routes/dashboard.jsx";
-import { getfirebase } from "../../firebase";
-import Axios from "axios";
-
 class Header extends React.Component {
   constructor(props) {
     super(props);
@@ -31,8 +25,8 @@ class Header extends React.Component {
       isOpen: false,
       dropdownOpen: false,
       color: "transparent",
-      value: "",
-      value1: "",
+      crop: "",
+      category: "",
       role: "",
     };
     this.toggle = this.toggle.bind(this);
@@ -101,25 +95,7 @@ class Header extends React.Component {
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor.bind(this));
-    var fire = getfirebase();
-    fire.auth().onAuthStateChanged(user => {
-      if (user) {
-
-        fire
-          .database()
-          .ref("users/" + user.uid)
-          .once("value")
-          .then(snapshot => {
-            this.setState({
-              role: snapshot.val().role
-            });
-            console.log("role", snapshot.val().role);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }
-    });
+    
   }
   componentDidUpdate(e) {
     if (
@@ -132,49 +108,14 @@ class Header extends React.Component {
     }
   }
   logout() {
-    var fire = getfirebase();
-    console.log("k");
-    fire
-      .auth()
-      .signOut()
-      .then(() => {
-        this.props.history.push("/login");
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  this.props.logout();
+  sessionStorage.clear();
+  this.props.history.push("/auth");
   }
-  sendnot() {
-    toast.info("Push notification sent to all concerned");
-    var firebase = getfirebase();
-    firebase.database().ref('users').once('value').then((data) => {
-      var users = data.val();
-      users = Object.entries(users);
-      console.log(users);
-      for (var i = 0; i < users.length; i++) {
-        Axios.post('https://fcm.googleapis.com/fcm/send', {
-          "notification": {
-            "title": "BugBuster",
-            "body": "Water Borne disease on rise in your region!!",
-            "click_action": "url",
-            "icon": "picture"
-          },
-          "to": users[i][1].token
-        }, {
-            headers: {
-              'Authorization': 'key=AAAAviPMTG4:APA91bHP1-h21hufRQxVzaOt3Bxsan1qwCrLykXKmIMkYkygAhaBWFHW5ZZT--xvroH6f32HMKmgW3s92k4uDz0-yHXgssXWMV9a_u4Qs_D9fEkxN8WkihozB6YBUhNv9ED-47bvkafc'
-            }
-          }).then(data => {
-            console.log(data);
-          }).catch((error) => {
-            console.log(error);
-          })
-      }
-    })
-  }
+
   render() {
     return (
-      // add or remove classes depending if we are on full-screen-maps page or not
+      
       <Navbar
         color={
           this.props.location.pathname.indexOf("full-screen-maps") !== -1
@@ -188,6 +129,7 @@ class Header extends React.Component {
             : "navbar-absolute fixed-top " +
             (this.state.color === "transparent" ? "navbar-transparent " : "")
         }
+       
       >
         <ToastContainer></ToastContainer>
         <Container fluid>
@@ -221,14 +163,14 @@ class Header extends React.Component {
               <Autocomplete
                 getItemValue={item => item}
                 items={[
-                  "Raagi",
-                  "Rice",
-                  "Wheat",
-                  "Maize",
-                  "All"
+                  "raagi",
+                  "rice",
+                  "wheat",
+                  "maize",
+                  "all"
                 ]}
                 shouldItemRender={(item, value) =>
-                  item.slice(0, value.length).toLowerCase() ==
+                  item.slice(0, value.length).toLowerCase() ===
                   value.toLowerCase()
                 }
                 renderItem={(item, isHighlighted) => {
@@ -238,11 +180,11 @@ class Header extends React.Component {
                     </div>
                   );
                 }}
-                value={this.state.value1}
-                onChange={e => this.setState({ value1: e.target.value })}
+                value={this.state.crop}
+                onChange={e => this.setState({ crop: e.target.value })}
                 onSelect={val => {
-                  this.setState({ value1: val });
-                  this.props.changestate1(val);
+                  this.setState({ crop: val });
+                  this.props.selectCrop(val);
                 }}
                 wrapperProps={{
                   className: "no-border input-group",
@@ -250,54 +192,22 @@ class Header extends React.Component {
                 }}
                 inputProps={{
                   className: "form-control",
-                  placeholder: "Select the crop to be bought",
+                  placeholder: "Select the crop",
                   style: { marginBottom: "5px", borderRadius: "30px",align:"center" }
                 }}
               />
-            </form>
-            <form>
-              <Autocomplete
+              </form>
+              <form>
+                <Autocomplete
                 getItemValue={item => item}
                 items={[
-                  "Andhra Pradesh",
-                  "Arunachal Pradesh",
-                  "Assam",
-                  "Bihar",
-                  "Chattisgarh",
-                  "Goa",
-                  "Gujarat",
-                  "Haryana",
-                  "Himachal Pradesh",
-                  "Jammu And Kashmir",
-                  "Jharkhand",
-                  "Karnataka",
-                  "Kerala",
-                  "Madhya Pradesh",
-                  "Maharashtra",
-                  "Manipur",
-                  "Meghalaya",
-                  "Mizoram",
-                  "Nagaland",
-                  "Odisha",
-                  "Punjab",
-                  "Rajasthan",
-                  "Sikkim",
-                  "Tamil Nadu",
-                  "Telangana",
-                  "Tripura",
-                  "Uttarakhand",
-                  "Uttar Pradesh",
-                  "West Bengal",
-                  "A & N Islands",
-                  "Chandigarh",
-                  "D & N Haveli",
-                  "Daman & Diu",
-                  "Delhi",
-                  "Lakshdweep",
-                  "Puducherry"
+                  "premium",
+                  "elite",
+                  "classic",
+                  "all"
                 ]}
                 shouldItemRender={(item, value) =>
-                  item.slice(0, value.length).toLowerCase() ==
+                  item.slice(0, value.length).toLowerCase() ===
                   value.toLowerCase()
                 }
                 renderItem={(item, isHighlighted) => {
@@ -307,29 +217,26 @@ class Header extends React.Component {
                     </div>
                   );
                 }}
-                value={this.state.value}
-                onChange={e => this.setState({ value: e.target.value })}
+                value={this.state.category}
+                onChange={e =>{this.setState({ category: e.target.value })}}
                 onSelect={val => {
-                  this.setState({ value: val });
-                  this.props.changestate(val);
+
+                  this.setState({ category: val });
+                  this.props.cropQuality(val);
                 }}
                 wrapperProps={{
                   className: "no-border input-group",
-                  style: {}
+                  style: { align:"center"}
                 }}
                 inputProps={{
                   className: "form-control",
-                  placeholder: "Select the state",
-                  style: { marginBottom: "5px", borderRadius: "30px" }
+                  placeholder: "Select crop category",
+                  style: { marginBottom: "5px", borderRadius: "30px",align:"center" }
                 }}
               />
             </form>
+
             <Nav navbar>
-              {this.state.role == "A" ? <NavItem >
-                <a href="#" className="nav-link">
-                  <i onClick={this.sendnot} className="now-ui-icons arrows-1_cloud-upload-94" />
-                </a>
-              </NavItem> : ""}
 
               <Dropdown
                 nav
@@ -340,13 +247,11 @@ class Header extends React.Component {
                 <DropdownToggle caret nav>
                   <i className="now-ui-icons users_single-02" />
                   <p>
-                    <span className="d-lg-none d-md-block">Some Actions</span>
+                    <span className="d-lg-none d-md-block">User</span>
                   </p>
                 </DropdownToggle>
                 <DropdownMenu right>
-                  <DropdownItem href="/user-page" tag="a">
-                    User Profile
-                  </DropdownItem>
+
                   <DropdownItem onClick={() => this.logout()} tag="a">
                     Log out
                   </DropdownItem>
@@ -362,4 +267,9 @@ class Header extends React.Component {
   }
 }
 
-export default Header;
+const mapDispatchToProps = dispatch =>({
+  selectCrop : (crop)=>dispatch(selectCropType(crop)),
+  cropQuality:(category)=>dispatch(selectCropQuality(category)),
+  logout:()=>dispatch(setCurrentUser(null))
+});
+export default connect(null,mapDispatchToProps)(withRouter(Header));

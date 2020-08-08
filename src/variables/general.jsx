@@ -22,7 +22,7 @@ const tasks = [
 // // // table head data and table body data for Tables view
 // #############################
 
-const thead = ["Date of complain", "Name", "Regular Flucations", "Reported Authority","Change Taste","Water Taste","action taken",""];
+const thead = ["Farmer Name", "Complaints", "Avg Rating","Ratings"];
 const tbody = [
   {
     className: "table-success",

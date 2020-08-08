@@ -4,128 +4,115 @@ import {
   CardBody,
   CardHeader,
   CardTitle,
-  Table,
   Row,
   Col,
-  Input,
-  FormGroup,
-  Label
 } from "reactstrap";
-
+import { Table } from "react-bootstrap";
+import Loader from "react-loader-spinner";
 import PanelHeader from "../../layouts/PanelHeader/PanelHeader"
-
-import { thead, tbody } from "variables/general";
-import { getfirebase } from "../../firebase";
-
-class RegularTables extends React.Component {
-  constructor(props) {
-    super(props);
-    {
-      this.state = {
-        issues: []
-      };
+import { Link } from "react-router-dom";
+import { thead } from "variables/general";
+import { gql } from 'apollo-boost';
+import { useQuery } from '@apollo/react-hooks';
+import { connect } from "react-redux"
+const FARMERS_QUERY = gql`
+query($crop:String!,$category:String!){
+  complaints(crop:$crop,category:$category){
+    farmer{
+      _id
+      name
+      avg_rating
+      ratings
     }
-  }
-  componentDidMount() {
-    var firebase = getfirebase();
-    firebase
-      .database()
-      .ref("Issues")
-      .on("value", snapshot => {
-        this.setState({
-          issues: snapshot.val()
-        });
-        console.log(snapshot.val());
-      });
-  }
-  actiontaken(key, value) {
-    var firebase = getfirebase();
-    console.log(key);
-    var update = {};
-    firebase
-      .database()
-      .ref("Issues/" + key)
-      .update({
-        ActionsTaken: value
-      });
-  }
-  render() {
-    return (
-      <div>
-        <PanelHeader size="sm" />
-        <div className="content">
-          <Row>
-            <Col xs={12}>
-              <Card>
-                <CardHeader>
-                  <CardTitle tag="h4">Issues reported</CardTitle>
-                </CardHeader>
-                <CardBody>
-                  <Table responsive>
-                    <thead className="text-primary">
-                      <tr>
-                        {thead.map((prop, key) => {
-                          if (key === thead.length - 1)
-                            return (
-                              <th key={key} className="text-right">
-                                {prop}
-                              </th>
-                            );
-                          return <th key={key}>{prop}</th>;
-                        })}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {this.state.issues.map((prop, key) => {
-                        return (
-                          <tr key={key}>
-                            <td>{prop.DateOfComplain}</td>
-                            <td>{prop.Name}</td>
-                            <td>{prop.RegularFluctuations}</td>
-                            <td>{prop.ReportedAuthorities}</td>
-                            <td>{prop.ChangeTaste}</td>
-                            <td>{prop.WaterTaste}</td>
-                            <td>
-                              {prop.ActionsTaken == "No" ? (
-                                <FormGroup check>
-                                  <Label check>
-                                    <Input
-                                      type="checkbox"
-                                      onChange={() =>
-                                        this.actiontaken(key, "Yes")
-                                      }
-                                    />
-                                    <span className="form-check-sign" />
-                                  </Label>
-                                </FormGroup>
-                              ) : (
-                                <FormGroup check>
-                                  <Label check>
-                                    <Input
-                                      type="checkbox"
-                                      checked={true}
-                                      onChange={() =>
-                                        this.actiontaken(key, "No")
-                                      }
-                                    />
-                                    <span className="form-check-sign" />
-                                  </Label>
-                                </FormGroup>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </Table>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-        </div>
-      </div>
-    );
-  }
+   count
+    }
 }
 
-export default RegularTables;
+`
+
+const RegularTables = (props) => {
+  console.log(props);
+  const { data, error, loading } = useQuery(FARMERS_QUERY, {
+    variables: { crop: props.crop, category: props.category }
+  });
+
+
+  const selectionHandler = (farmerId) => {
+    props.history.push(`/user/${farmerId}`);
+  }
+
+
+  if (error) {
+    console.log(error);
+    return <p>...........</p>
+  }
+  return (
+    <div>
+      <PanelHeader size="sm" />
+      <div className="content">
+        <Row>
+          <Col xs={12}>
+            <Card style={{ height: "500px" }}>
+              <CardHeader>
+                <CardTitle tag="h4">Farmer analytics</CardTitle>
+              </CardHeader>
+              <CardBody>
+                {
+                  loading ?
+                    <div style={{ position: "relative", top: "17vh", left: "30vw", height: "404px", width: "40%" }}>
+                      <Loader type="Rings"
+                        color="blue"
+                        height={100}
+                        width={100}
+                        timeout={3000} />
+                    </div> : <Table striped={true} borderless={true} responsive="md" style={{ overflowX: 'hidden' }}>
+                      <thead className="text-primary">
+                        <tr style={{ textAlign: 'center' }}>
+                          {thead.map((prop, key) => {
+                            if (key === thead.length - 1)
+                              return (
+                                <th key={key} className="text-center">
+                                  {prop}
+                                </th>
+                              );
+                            return <th key={key}>{prop}</th>;
+                          })}
+                        </tr>
+                      </thead>
+                      <tbody>
+
+                        {data.complaints.map((prop, key) => {
+                          return (
+
+                            <tr onClick={() => selectionHandler(prop.farmer._id)} style={{ textAlign: 'center', cursor: "pointer" }} key={key}>
+
+                              <td className="text-center">{`${prop.farmer.name}`}</td>
+                              <td className="text-center">{prop.count}</td>
+                              <td className="text-center">{prop.farmer.avg_rating.toFixed(2)}</td>
+                              <td className="text-center">{prop.farmer.ratings}</td>
+
+                            </tr>
+
+                          );
+                        })}
+                      </tbody>
+                    </Table>
+                }
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+
+
+
+
+    </div>
+  );
+
+}
+const mapStateToProps = state => ({
+  crop: state.crop.selectedCrop,
+  category: state.crop.cropQuality
+});
+export default connect(mapStateToProps)(RegularTables);

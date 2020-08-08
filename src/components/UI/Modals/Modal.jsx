@@ -1,27 +1,27 @@
-import React,{Component} from 'react';
+import React from 'react';
 import  './Modal.css';
-import Backdrop from '../Backdrop/Backdrop';
+import User from '../../../views/UserPage/UserPage';
 
-class Modal extends Component{
 
-    
 
-    render(){
+const modal=  props =>{
+    const cssClasses = [
+        "Modal",
+        "ModalOpen"
+      ];
+
+
+
         return (
-            <React.Fragment>
-                <Backdrop show={this.props.show} clicked={this.props.close} />
-                <div className="Modal" style={{
-                    transform: this.props.show ? 'translateY(0)' : 'translasteY(-100vh)',
-                    opacity: this.props.show ? '1' : '0'
-                }}>
-                    {
-                        this.props.children
-                    }
+
+
+                <div className={cssClasses.join(' ')}>
+        <User farmerId={props.match.params.id}/>
+
                 </div>
-            </React.Fragment>
         );
-    }
-   
+
+
 }
 
-export default Modal;
+export default modal;

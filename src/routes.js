@@ -1,76 +1,75 @@
-import React, { Component } from 'react'
-import { Route, BrowserRouter, Link, Redirect, Switch } from 'react-router-dom'
-import { initializeFirebase } from './firebase'
-import Dashboard from "./layouts/Dashboard/Dashboard.jsx";
-import Login from "./layouts/login/login.jsx";
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider } from '@apollo/react-hooks';
-
-const token = localStorage.getItem('AUTH_TOKEN');
-
+import React, { Component } from "react";
+import Loader from 'react-loader-spinner';
+import { Route, Switch ,BrowserRouter} from "react-router-dom";
+import { setCurrentUser } from "./redux/user/user.actions";
+import Auth from "./layouts/login/authComponent.jsx";
+import { connect } from "react-redux";
+import PrivateRoute from "./views/privateRoute/privateRoutes.jsx";
+import {ApolloProvider} from 'react-apollo';
+import { createHttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import {ApolloClient} from "apollo-boost";
+import Axios from "axios";
+const httpLink = new createHttpLink({
+  uri: "https://buyfreshdtu.xyz/graph"
+});
+const cache = new InMemoryCache();
 const client = new ApolloClient({
-    uri: 'http://localhost:8000/graph',
-    request: (operation) => {
-        operation.setContext({
-            headers: {
-                authorization: token ? `${token}` : 'ZOWI'
-            }
-        })
-    }
-})
+  link:httpLink,
+  cache
+});
 
-function PrivateRoute({ component: Component, authed, ...rest }) {
+class App extends Component {
+  state = {
+    loading: true,
+  };
 
-    return (
-        <Route
-            {...rest}
-            render={(props) => {
-                console.log('abhinav', props);
-                return (
-                    authed === true
-                        ? <Component {...props} />
-                        : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
-                );
-            }}
-        />
-    )
-}
+  async componentDidMount() {
+    this.setState({ loading: false });
 
+let token = sessionStorage.getItem("token");
+// let token = "1234";
 
-export default class App extends Component {
-    state = {
-        authed: false,
-        loading: true,
+// verify the validity of token
+let response  = await Axios.get("https://buyfreshdtu.xyz/api/check-session",{
+  headers:{
+    "Authorization" :`Bearer ${token}`
+  }
+});
+
+    if (token && response.status!=402) {
+      this.props.setCurrentUser(`Mr.Kisan`);
     }
-    componentDidMount() {
-        var firebase = initializeFirebase();
-        this.removeListener = firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                this.setState({
-                    authed: true,
-                    loading: false,
-                })
-            } else {
-                this.setState({
-                    authed: false,
-                    loading: false
-                })
-            }
-        })
-    }
-    componentWillUnmount() {
-        this.removeListener()
-    }
-    render() {
-        return this.state.loading === true ? <h1></h1> : (
-            <ApolloProvider client={client}>
-                <BrowserRouter>
-                    <Switch>
-                        <Route authed={this.state.authed} path='/login' key="Login" component={Login} />
-                        <PrivateRoute authed={this.state.authed} path='/' key="Home" component={Dashboard} />
-                    </Switch>
-                </BrowserRouter>
+  }
+
+  render() {
+    return this.state.loading === true ? (
+      <Loader
+      type="Puff"
+      color="#00BFFF"
+      height={100}
+      width={100}
+      timeout={3000} 
+
+   />
+    ) : (
+      <ApolloProvider client={client}>
+      <BrowserRouter>
+        <Switch>
+          <Route path="/auth" exact key="Login" component={Auth} />
+          <PrivateRoute />
+        </Switch>
+            </BrowserRouter>
             </ApolloProvider>
-        );
-    }
+      
+    );
+  }
 }
+
+const mapStateToProps = (state) => ({
+  currentUser: state.user.currentUser,
+});
+const mapDispatchToProps = (dispatch) => ({
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(App);

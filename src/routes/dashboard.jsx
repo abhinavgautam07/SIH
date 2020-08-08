@@ -1,56 +1,49 @@
-import Dashboards from "views/Dashboard/Dashboard.jsx";
 import TableList from "views/TableList/TableList.jsx";
+import Requests from "../views/requests/requests.jsx";
 import Maps from "views/Maps/Maps.jsx";
-import UserPage from "views/UserPage/UserPage.jsx";
-import Login from "../layouts/login/login";
-import CaseReport from "../views/CaseReport/CaseReport"
-import Shopping from '../views/Shopping/Shopping';
+import UserPage from "../components/UI/Modals/Modal.jsx";
+import Blocks from "../views/blocks/blocks.jsx";
+import Analytics from "../views/analyse/analyse.jsx";
+import Predictions from "../views/predictions";
 var dashRoutes = [
+  
+  { path: "/maps", name: "maps", icon: "location_map-big", component: Maps },
   {
-    path: "/dashboard",
-    name: "Dashboard",
-    icon: "design_app",
-    component: Dashboards
-  },
-  //  { path: "/icons", name: "Icons", icon: "design_image", component: Icons },
-  { path: "/maps", name: "Maps", icon: "location_map-big", component: Maps },
-  {
-    path: "/case_report",
-    name: "Report Case",
-    icon: "files_single-copy-04",
-    component: CaseReport
+    path:"/analysis",
+    name:"Analyse",
+    icon:"business_chart-pie-36",
+    component:Analytics
   },
   {
-    path: "/user-page",
-    name: "User Profile",
-    icon: "users_single-02",
-    component: UserPage
+    path:"/predictions",
+    name:"Predictions",
+    icon:"media-2_sound-wave",
+    component:Predictions
   },
   {
-    path: "/extended-tables",
-    name: "Grievances",
-    icon: "files_paper",
-    component: TableList
+    path:"/farmer-feedback",
+    name:"Feedback",
+    icon:"ui-2_like",
+    component:TableList
   },
-  // {
-  //   path: "/typography",
-  //   name: "Typography",
-  //   icon: "design-2_ruler-pencil",
-  //   component: Typography
-  // },
-  // {
-  //   pro: true,
-  //   path: "/upgrade",
-  //   name: "Upgrade to PRO",
-  //   icon: "objects_spaceship",
-  //   component: Upgrade
-  // },
   {
-    path: "/shopping",
-    name: "Shopping",
-    icon: "shopping_cart-simple",
-    component: Shopping
+    path:"/requests",
+    name:"Requests",
+    icon:"ui-1_email-85",
+    component:Requests
   },
-  { redirect: true, path: "/", pathTo: "/dashboard", name: "Dashboard" }
+  {
+    path:"/user/:id",
+    name:"user",
+    icon:"ui-2_like",
+    component:UserPage
+  },
+  {
+    path:"/blocks",
+    name:"Blocks",
+    icon:"ui-2_settings-90",
+    component:Blocks
+  },
+  { redirect: true, path: "/", pathTo: "/maps", name: "Dashboard" }
 ];
 export default dashRoutes;

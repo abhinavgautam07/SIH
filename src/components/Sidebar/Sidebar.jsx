@@ -4,17 +4,17 @@ import { Nav } from "reactstrap";
 // javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
 import image from "../../assets/css/grass.jpeg";
-import logo from "logo-white.svg";
-import { getcurrentuser, getfirebase } from "../../firebase";
 import './sidebar.css';
+import { withRouter } from "react-router-dom";
 
 var ps;
 
 class Sidebar extends React.Component {
   constructor(props) {
     super(props);
+    
     this.state = {
-      user: ""
+      user: "Abhinav Gautam"
     }
     this.activeRoute.bind(this);
   }
@@ -29,14 +29,6 @@ class Sidebar extends React.Component {
         suppressScrollY: false
       });
     }
-    getcurrentuser().then((snapshot) => {
-      console.log("p", snapshot);
-      this.setState({
-        user: snapshot.val()
-      })
-    }).catch((error) => {
-      console.log(error);
-    })
 
   }
   componentWillUnmount() {
@@ -56,28 +48,24 @@ class Sidebar extends React.Component {
             className="simple-text logo-normal"
             style={{ marginLeft: "30px" }}
           >
-            {this.state.user ? "Hello, " + this.state.user.first_name + " " + this.state.user.last_name : ""}
+            {this.state.user}
           </div>
         </div>
         <div className="sidebar-wrapper" ref="sidebar">
           <Nav>
             {this.props.routes.map((prop, key) => {
-              if (prop.name == "User Profile") return null;
-              if (prop.name == "Report Case" && this.state.user.role == "A") {
+              if(prop.redirect || prop.name === "user"){
                 return null;
+
               }
-              if (prop.name == "Grievances" && this.state.user.role == "HA") {
-                return null;
-              }
-              if (prop.redirect) return null;
               return (
                 <li
-                  className={
-                    this.activeRoute(prop.path) +
-                    (prop.pro ? " active active-pro" : "")
-                  }
-                  key={key}
-                >
+                className={
+                  this.activeRoute(prop.path) +
+                  (prop.pro ? " active active-pro" : "")
+                }
+                key={key}
+              >
                   <NavLink
                     to={prop.path}
                     className="link"
@@ -86,6 +74,7 @@ class Sidebar extends React.Component {
                     <i className={"now-ui-icons " + prop.icon} />
                     <p>{prop.name}</p>
                   </NavLink>
+               
                 </li>
               );
             })}
@@ -96,4 +85,4 @@ class Sidebar extends React.Component {
   }
 }
 
-export default Sidebar;
+export default withRouter(Sidebar);
